@@ -26,6 +26,8 @@ public class UserDetail  {
 
     private String address;
 
+    private String email;
+
     private LocalDateTime lastUpdatedPasswordTime;
 
 
