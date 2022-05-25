@@ -27,6 +27,8 @@ public class Users extends DateAudit {
 
     private boolean isDeleted;
 
+    private boolean isEnabled;
+
     @ManyToOne
     @JoinColumn(name = "tenantId",nullable = false)
     private Tenant tenant;
