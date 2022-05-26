@@ -43,8 +43,6 @@ public class UserController {
     @PostMapping("/auth/login")
     public ResponseEntity<?> doLogin() {
         userService.login();
-        template.opsForValue().set("loda","hello world");
-        System.out.println("Value of key loda: "+template.opsForValue().get("loda"));
         return null;
 
     }
