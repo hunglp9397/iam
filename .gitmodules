@@ -1,0 +1,3 @@
+[submodule "iam-frontend/react-login-register-page"]
+	path = iam-frontend/react-login-register-page
+	url = https://github.com/hunglp9397/iam.git
