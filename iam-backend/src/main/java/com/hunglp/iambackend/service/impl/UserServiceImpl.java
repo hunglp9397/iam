@@ -20,6 +20,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
@@ -43,7 +44,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void login(String username, String password) {
+    public ResponseEntity<String> login(String username, String password) {
+        ResponseEntity<String> response =   keycloakService.authentication(env.getProperty("login-app"), username, password);
+        return response;
 
     }
 

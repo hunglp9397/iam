@@ -1,5 +1,6 @@
 package com.hunglp.iambackend.controller;
 
+import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.model.Users;
 import com.hunglp.iambackend.service.UserService;
@@ -41,9 +42,10 @@ public class UserController {
 
 
     @PostMapping("/auth/login")
-    public ResponseEntity<?> doLogin() {
-        userService.login();
-        return null;
+    public ResponseEntity<String> doLogin(LoginDTO loginDTO) {
+        ResponseEntity<String> responseAuthen = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+        return responseAuthen;
+
 
     }
 
