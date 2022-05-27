@@ -7,7 +7,7 @@ import com.hunglp.iambackend.dto.UserDTO;
 
 public interface UserService {
 
-    void login();
+    void login(String username, String password);
 
     void createUser(UserDTO userDTO);
 }

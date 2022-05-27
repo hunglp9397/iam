@@ -2,6 +2,7 @@ package com.hunglp.iambackend.service.impl;
 
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.repository.UserRepository;
+import com.hunglp.iambackend.service.KeycloakService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
@@ -37,9 +38,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private KeycloakService keycloakService;
+
 
     @Override
-    public void login() {
+    public void login(String username, String password) {
 
     }
 
