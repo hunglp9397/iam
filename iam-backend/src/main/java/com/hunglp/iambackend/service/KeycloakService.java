@@ -1,5 +1,7 @@
 package com.hunglp.iambackend.service;
 
+import com.hunglp.iambackend.exception.ResourceNotFoundException;
+import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.utils.CommonFunction;
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ public class KeycloakService {
     @Autowired
     private Environment environment;
 
-    public ResponseEntity<String> authentication(String username, String password){
+    public ResponseEntity<String> authentication(String username, String password) {
 
         RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.getAuthenUrl(environment.getProperty("keycloak.realm"));
@@ -26,7 +28,7 @@ public class KeycloakService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("client_id", environment.getProperty("keycloak.resource"));
         map.add("username", username);
         map.add("password", password);
@@ -38,10 +40,9 @@ public class KeycloakService {
         ResponseEntity<String> response = null;
         try {
             response = restTemplate.postForEntity(url, request, String.class);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw new UnauthorizedException("Authorization  fail");
         }
-
         return response;
 
 

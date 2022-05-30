@@ -1,6 +1,8 @@
 package com.hunglp.iambackend.service.impl;
 
+import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
+import com.hunglp.iambackend.model.Users;
 import com.hunglp.iambackend.repository.UserRepository;
 import com.hunglp.iambackend.service.KeycloakService;
 import com.hunglp.iambackend.service.UserService;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.Optional;
 
 
 @Service
@@ -107,4 +110,14 @@ public class UserServiceImpl implements UserService {
 
 
     }
+
+    @Override
+    public Optional<Users> findUser(LoginDTO loginDTO) {
+        return userRepository.findAccount(loginDTO.getUsername(),
+                                          CommonFunction.passwordBase64(loginDTO.getPassword()),
+                                          loginDTO.getTenantId(),
+                                 true);
+    }
+
+
 }

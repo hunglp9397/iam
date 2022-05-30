@@ -2,6 +2,7 @@ package com.hunglp.iambackend.controller;
 
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
+import com.hunglp.iambackend.exception.ResourceNotFoundException;
 import com.hunglp.iambackend.model.Users;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -43,9 +45,18 @@ public class UserController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<String> doLogin(@RequestBody LoginDTO loginDTO) {
-        ResponseEntity<String> responseAuthen = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
-        return responseAuthen;
+        ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
 
+        if (authenticateResponse.getStatusCodeValue() == 200){
+            Optional<Users> usersOptional = userService.findUser(loginDTO);
+            if(usersOptional.isPresent()){
+                return authenticateResponse;
+            }else{
+                throw new ResourceNotFoundException("Query fail");
+            }
+        }
+
+        return authenticateResponse;
 
     }
 
