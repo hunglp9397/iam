@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> login(String username, String password) {
-        ResponseEntity<String> response =   keycloakService.authentication(env.getProperty("login-app"), username, password);
+        ResponseEntity<String> response  =   keycloakService.authentication( username, password);
         return response;
 
     }

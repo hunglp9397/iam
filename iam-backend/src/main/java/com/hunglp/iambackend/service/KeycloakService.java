@@ -18,7 +18,7 @@ public class KeycloakService {
     @Autowired
     private Environment environment;
 
-    public ResponseEntity<String> authentication(String clientId, String username, String password){
+    public ResponseEntity<String> authentication(String username, String password){
 
         RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.getAuthenUrl(environment.getProperty("keycloak.realm"));
@@ -27,7 +27,7 @@ public class KeycloakService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        map.add("client_id", environment.getProperty("login-app"));
+        map.add("client_id", environment.getProperty("keycloak.resource"));
         map.add("username", username);
         map.add("password", password);
         map.add("grant_type", "password");

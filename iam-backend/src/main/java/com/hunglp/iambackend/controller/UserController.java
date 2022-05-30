@@ -42,7 +42,7 @@ public class UserController {
 
 
     @PostMapping("/auth/login")
-    public ResponseEntity<String> doLogin(LoginDTO loginDTO) {
+    public ResponseEntity<String> doLogin(@RequestBody LoginDTO loginDTO) {
         ResponseEntity<String> responseAuthen = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
         return responseAuthen;
 
