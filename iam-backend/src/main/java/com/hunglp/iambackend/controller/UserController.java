@@ -4,6 +4,7 @@ import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.exception.ResourceNotFoundException;
 import com.hunglp.iambackend.model.Users;
+import com.hunglp.iambackend.service.KeycloakService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
@@ -40,6 +41,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private KeycloakService keycloakService;
+
 
 
 
@@ -64,6 +68,7 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
 
         userService.createUser(userDTO);
+//        keycloakService.createKeycloakUser(userDTO);
         return ResponseEntity.ok(userDTO);
 
     }
