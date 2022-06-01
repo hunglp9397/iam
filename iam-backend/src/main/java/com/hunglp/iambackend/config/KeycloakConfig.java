@@ -4,12 +4,12 @@ import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-public class KeycloackConfig {
+public class KeycloakConfig {
 
     @Autowired
-    Environment env;
+    static Environment env;
 
-    public Keycloak getKeycloakInstance() {
+    public static  Keycloak getKeycloakInstance() {
         return Keycloak.getInstance(
                 env.getProperty("keycloak.auth-server-url"),
                 env.getProperty("keycloak.realm"),

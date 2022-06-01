@@ -1,8 +1,8 @@
 package com.hunglp.iambackend.service;
 
+import com.hunglp.iambackend.config.KeycloakConfig;
 import com.hunglp.iambackend.config.KeycloakProvider;
 import com.hunglp.iambackend.dto.UserDTO;
-import com.hunglp.iambackend.exception.ResourceNotFoundException;
 import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.utils.CommonFunction;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -40,7 +40,7 @@ public class KeycloakService {
         this.kcProvider = keycloakProvider;
     }
 
-    public ResponseEntity<String> authentication(String username, String password) {
+    public ResponseEntity<String> authentication(String username, String password, String clientId) {
 
         RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.getAuthenUrl(environment.getProperty("keycloak.realm"));
@@ -49,7 +49,7 @@ public class KeycloakService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("client_id", environment.getProperty("keycloak.resource"));
+        map.add("client_id", clientId);
         map.add("username", username);
         map.add("password", password);
         map.add("grant_type", "password");
@@ -67,41 +67,49 @@ public class KeycloakService {
 
     }
 
-    public Response createKeycloakUser(UserDTO userDTO) {
-        UsersResource usersResource = kcProvider.getInstance().realm(realm).users();
-        CredentialRepresentation credentialRepresentation = createPasswordCredentials(userDTO.getPassword());
+    public void createKeycloakUser(UserDTO userDTO) {
+//        UsersResource usersResource = kcProvider.getInstance().realm(realm).users();
+//        CredentialRepresentation credentialRepresentation = createPasswordCredentials(userDTO.getPassword());
+//
+//        UserRepresentation kcUser = new UserRepresentation();
+//        kcUser.setUsername(userDTO.getEmail());
+//        kcUser.setCredentials(Collections.singletonList(credentialRepresentation));
+//        kcUser.setFirstName(userDTO.getFirstName());
+//        kcUser.setLastName(userDTO.getLastName());
+//        kcUser.setEmail(userDTO.getEmail());
+//        kcUser.setEnabled(true);
+//        kcUser.setEmailVerified(false);
+//
+//        Response response = null;
+//        try {
+//             response = usersResource.create(kcUser);
+//        }catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
+//
+//
+//        if (response.getStatus() == 201) {
+//            System.out.println("Create user successfully");
+//        }
+//
+//        return response;
 
-        UserRepresentation kcUser = new UserRepresentation();
-        kcUser.setUsername(userDTO.getEmail());
-        kcUser.setCredentials(Collections.singletonList(credentialRepresentation));
-        kcUser.setFirstName(userDTO.getFirstName());
-        kcUser.setLastName(userDTO.getLastName());
-        kcUser.setEmail(userDTO.getEmail());
-        kcUser.setEnabled(true);
-        kcUser.setEmailVerified(false);
+        CredentialRepresentation credential = KeycloakProvider
+                .createPasswordCredentials(userDTO.getPassword());
+        UserRepresentation user = new UserRepresentation();
+        user.setUsername(userDTO.getUsername());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setCredentials(Collections.singletonList(credential));
+        user.setEnabled(true);
 
-        Response response = null;
+        UsersResource instance = getInstance();
         try {
-             response = usersResource.create(kcUser);
+            instance.create(user);
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println(e);
         }
-
-
-        if (response.getStatus() == 201) {
-            System.out.println("Create user successfully");
-            //If you want to save the user to your other database, do it here, for example:
-//            User localUser = new User();
-//            localUser.setFirstName(kcUser.getFirstName());
-//            localUser.setLastName(kcUser.getLastName());
-//            localUser.setEmail(user.getEmail());
-//            localUser.setCreatedDate(Timestamp.from(Instant.now()));
-//            String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-//            usersResource.get(userId).sendVerifyEmail();
-//            userRepository.save(localUser);
-        }
-
-        return response;
 
     }
 
@@ -112,5 +120,10 @@ public class KeycloakService {
         passwordCredentials.setValue(password);
         return passwordCredentials;
     }
+
+    public UsersResource getInstance(){
+        return kcProvider.getInstance().realm(kcProvider.realm).users();
+    }
+
 
 }

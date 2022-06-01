@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface UserService {
 
-    ResponseEntity<String> login(String username, String password);
+    ResponseEntity<String> login(String username, String password, String tenant);
 
     void createUser(UserDTO userDTO);
 
-    Optional<Users> findUser(LoginDTO loginDTO);
+    Optional<Users> findUser(String username, String password, String tenant);
 }

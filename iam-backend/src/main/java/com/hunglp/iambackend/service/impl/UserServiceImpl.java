@@ -8,6 +8,7 @@ import com.hunglp.iambackend.service.KeycloakService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
+import org.apache.http.auth.Credentials;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 
@@ -47,8 +49,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<String> login(String username, String password) {
-        ResponseEntity<String> response  =   keycloakService.authentication( username, password);
+    public ResponseEntity<String> login(String username, String password, String tenant) {
+        ResponseEntity<String> response = keycloakService.authentication(username, password, tenant);
         return response;
 
     }
@@ -57,66 +59,63 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserDTO userDTO) {
 
 
-        Keycloak keycloak = KeycloakBuilder.builder().serverUrl(env.getProperty("keycloak.auth-server-url"))
-                .grantType(OAuth2Constants.PASSWORD).realm("master").clientId("admin-cli")
-                .username(userDTO.getUsername()).password(CommonFunction.passwordBase64(userDTO.getPassword()))
-                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build()).build();
-
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEnabled(true);
-        userRepresentation.setUsername(userDTO.getUsername());
-        userRepresentation.setFirstName(userDTO.getFirstName());
-        userRepresentation.setLastName(userDTO.getLastName());
-        userRepresentation.setEmail(userDTO.getEmail());
-
-        RealmResource realmResource = keycloak.realm(env.getProperty("keycloak.realm"));
-        UsersResource usersRessource = realmResource.users();
-
-        Response response = null;
-        try {
-            response = usersRessource.create(userRepresentation);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-
-
-        userDTO.setStatusCode(response.getStatus());
-        userDTO.setStatus(response.getStatusInfo().toString());
-
-        if (response.getStatus() == 201) {
-
-            String userId = CreatedResponseUtil.getCreatedId(response);
-
-//            log.info("Created userId {}", userId);
-
-
-            // create password credential
-            CredentialRepresentation passwordCred = new CredentialRepresentation();
-            passwordCred.setTemporary(false);
-            passwordCred.setType(CredentialRepresentation.PASSWORD);
-            passwordCred.setValue(userDTO.getPassword());
-
-            UserResource userResource = usersRessource.get(userId);
-
-            // Set password credential
-            userResource.resetPassword(passwordCred);
-
-            // Get realm role student
-            RoleRepresentation realmRoleUser = realmResource.roles().get(CommonConstant.roleUser).toRepresentation();
-
-            // Assign realm role student to user
-            userResource.roles().realmLevel().add(Arrays.asList(realmRoleUser));
-        }
+//        Keycloak keycloak = KeycloakBuilder.builder().serverUrl(env.getProperty("keycloak.auth-server-url"))
+//                .grantType(OAuth2Constants.PASSWORD).realm("master").clientId("admin-cli")
+//                .username(userDTO.getUsername()).password(CommonFunction.passwordBase64(userDTO.getPassword()))
+//                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build()).build();
+//
+//        UserRepresentation userRepresentation = new UserRepresentation();
+//        userRepresentation.setEnabled(true);
+//        userRepresentation.setUsername(userDTO.getUsername());
+//        userRepresentation.setFirstName(userDTO.getFirstName());
+//        userRepresentation.setLastName(userDTO.getLastName());
+//        userRepresentation.setEmail(userDTO.getEmail());
+//
+//        RealmResource realmResource = keycloak.realm(env.getProperty("keycloak.realm"));
+//        UsersResource usersRessource = realmResource.users();
+//
+//        Response response = null;
+//        try {
+//            response = usersRessource.create(userRepresentation);
+//        } catch (Exception ex) {
+//            System.out.println(ex.getMessage());
+//        }
+//
+//
+//        userDTO.setStatusCode(response.getStatus());
+//        userDTO.setStatus(response.getStatusInfo().toString());
+//
+//        if (response.getStatus() == 201) {
+//
+//            String userId = CreatedResponseUtil.getCreatedId(response);
+//
+////            log.info("Created userId {}", userId);
+//
+//
+//            // create password credential
+//            CredentialRepresentation passwordCred = new CredentialRepresentation();
+//            passwordCred.setTemporary(false);
+//            passwordCred.setType(CredentialRepresentation.PASSWORD);
+//            passwordCred.setValue(userDTO.getPassword());
+//
+//            UserResource userResource = usersRessource.get(userId);
+//
+//            // Set password credential
+//            userResource.resetPassword(passwordCred);
+//
+//            // Get realm role student
+//            RoleRepresentation realmRoleUser = realmResource.roles().get(CommonConstant.roleUser).toRepresentation();
+//
+//            // Assign realm role student to user
+//            userResource.roles().realmLevel().add(Arrays.asList(realmRoleUser));
+//        }
 
 
     }
 
     @Override
-    public Optional<Users> findUser(LoginDTO loginDTO) {
-        return userRepository.findAccount(loginDTO.getUsername(),
-                                          CommonFunction.passwordBase64(loginDTO.getPassword()),
-                                          loginDTO.getTenantId(),
-                                 true);
+    public Optional<Users> findUser(String username, String password, String tenant) {
+        return userRepository.findAccount(username, password, tenant, false);
     }
 
 

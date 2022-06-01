@@ -9,7 +9,5 @@ public class LoginDTO {
 
     private String password;
 
-    private String tenantId;
-
     private boolean isDeleted;
 }

@@ -3,8 +3,11 @@ package com.hunglp.iambackend.controller;
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.exception.ResourceNotFoundException;
+import com.hunglp.iambackend.intercepter.TenantContext;
+import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
 import com.hunglp.iambackend.service.KeycloakService;
+import com.hunglp.iambackend.service.TenantService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
@@ -44,15 +47,23 @@ public class UserController {
     @Autowired
     private KeycloakService keycloakService;
 
+    @Autowired
+    private TenantService tenantService;
 
 
 
     @PostMapping("/auth/login")
     public ResponseEntity<String> doLogin(@RequestBody LoginDTO loginDTO) {
-        ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+
+        String tenantName = TenantContext.getCurrentTenant();
+        Optional<Tenant> tenant = tenantService.findByTenantName(tenantName);
+
+
+
+        ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
 
         if (authenticateResponse.getStatusCodeValue() == 200){
-            Optional<Users> usersOptional = userService.findUser(loginDTO);
+            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
             if(usersOptional.isPresent()){
                 return authenticateResponse;
             }else{
@@ -67,8 +78,9 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
 
-        userService.createUser(userDTO);
-//        keycloakService.createKeycloakUser(userDTO);
+        String tenant = TenantContext.getCurrentTenant();
+        System.out.println(tenant);
+        keycloakService.createKeycloakUser(userDTO);
         return ResponseEntity.ok(userDTO);
 
     }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -51,16 +52,14 @@ public class KeycloakProvider {
                 .password(password);
     }
 
-//    public JsonNode refreshToken(String refreshToken) throws UnirestException {
-//        String url = serverURL + "/realms/" + realm + "/protocol/openid-connect/token";
-//        return Unirest.post(url)
-//                .header("Content-Type", "application/x-www-form-urlencoded")
-//                .field("client_id", clientID)
-//                .field("client_secret", clientSecret)
-//                .field("refresh_token", refreshToken)
-//                .field("grant_type", "refresh_token")
-//                .asJson().getBody();
-//    }
+    public static CredentialRepresentation createPasswordCredentials(String password) {
+        CredentialRepresentation passwordCredentials = new CredentialRepresentation();
+        passwordCredentials.setTemporary(false);
+        passwordCredentials.setType(CredentialRepresentation.PASSWORD);
+        passwordCredentials.setValue(password);
+        return passwordCredentials;
+    }
+
 
 
 

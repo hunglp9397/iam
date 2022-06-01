@@ -16,8 +16,8 @@ import java.util.Set;
 public class Tenant extends DateAudit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long tenantId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long tenantId;
 
     private String name;
 

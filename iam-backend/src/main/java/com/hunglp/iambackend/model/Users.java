@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Users extends DateAudit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
 
     private String username;
