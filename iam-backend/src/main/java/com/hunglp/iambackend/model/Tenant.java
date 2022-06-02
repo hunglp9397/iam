@@ -21,6 +21,7 @@ public class Tenant extends DateAudit {
 
     private String name;
 
+    @Column(nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isDeleted;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant", cascade = CascadeType.ALL)

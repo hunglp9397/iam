@@ -31,6 +31,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> createUser(@RequestBody @Valid UserDTO userDTO) {
 
         String tenant = TenantContext.getCurrentTenant();
         System.out.println(tenant);

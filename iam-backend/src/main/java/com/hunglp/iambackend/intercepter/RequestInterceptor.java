@@ -1,10 +1,17 @@
 package com.hunglp.iambackend.intercepter;
 
+import com.hunglp.iambackend.model.Tenant;
+import com.hunglp.iambackend.service.TenantService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 public class RequestInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private TenantService tenantService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -18,8 +25,10 @@ public class RequestInterceptor implements HandlerInterceptor {
             response.getWriter().write("X-TenantID not present in the Request Header");
             response.setStatus(400);
             return false;
-
         }
+        Optional<Tenant> tenant = tenantService.findByTenantName(tenantId);
+        if(tenant.isPresent())
+
         TenantContext.setCurrentTenant(tenantId);
         return true;
     }

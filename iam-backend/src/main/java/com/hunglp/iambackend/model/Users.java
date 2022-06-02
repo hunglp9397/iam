@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.tomcat.jni.Address;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @Data
@@ -25,8 +26,11 @@ public class Users extends DateAudit {
 
     private String secretCode;
 
+    @Column(nullable = false, columnDefinition = "TINYINT", length = 1)
+
     private boolean isDeleted;
 
+    @Column(nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isEnabled;
 
     @ManyToOne

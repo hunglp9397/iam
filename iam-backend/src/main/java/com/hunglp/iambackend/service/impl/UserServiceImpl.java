@@ -2,7 +2,9 @@ package com.hunglp.iambackend.service.impl;
 
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
+import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
+import com.hunglp.iambackend.repository.TenantRepository;
 import com.hunglp.iambackend.repository.UserRepository;
 import com.hunglp.iambackend.service.KeycloakService;
 import com.hunglp.iambackend.service.UserService;
@@ -39,6 +41,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private TenantRepository tenantRepository;
+
+    @Autowired
     private RedisTemplate template;
 
     @Autowired
@@ -57,6 +62,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(UserDTO userDTO) {
+        Users user = new Users();
+        user.setUsername(user.getUsername());
+        user.setPassword(user.getPassword());
+        Optional<Tenant> tenant = tenantRepository.findById(1L);
+        user.setTenant(tenant.get());
+
+        this.userRepository.save(user);
 
 
 //        Keycloak keycloak = KeycloakBuilder.builder().serverUrl(env.getProperty("keycloak.auth-server-url"))

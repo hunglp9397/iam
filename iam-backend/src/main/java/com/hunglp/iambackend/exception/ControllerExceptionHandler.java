@@ -31,5 +31,12 @@ public class ControllerExceptionHandler {
                 request, HttpStatus.valueOf(HttpStatus.UNAUTHORIZED.value())), HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<ErrorMessage> unauthorizedException(InternalServerErrorException ex, WebRequest request) {
+
+        return new ResponseEntity<>(ErrorMessage.getMessage(ex,
+                request, HttpStatus.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 }
