@@ -59,12 +59,10 @@ public class UserController {
         String tenantName = TenantContext.getCurrentTenant();
         Optional<Tenant> tenant = tenantService.findByTenantName(tenantName);
 
-
-
         ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
 
         if (authenticateResponse.getStatusCodeValue() == 200){
-            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
+            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getTenantId());
             if(usersOptional.isPresent()){
                 return authenticateResponse;
             }else{

@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends  JpaRepository<Users, Long> {
 
-    @Query("select u from Users u where u.username = ?1 and  u.password=?2 and u.tenant=?3 and u.isDeleted=?4")
-    Optional<Users> findAccount(String username, String password, String tenant, boolean isDeleted);
+    @Query("select u from Users u where u.username = ?1 and  u.password=?2 and u.tenant.tenantId=?3 and u.isDeleted=?4")
+    Optional<Users> findAccount(String username, String password, Long tenantId, boolean isDeleted);
 }

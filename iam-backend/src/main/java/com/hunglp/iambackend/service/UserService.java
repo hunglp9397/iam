@@ -1,7 +1,6 @@
 package com.hunglp.iambackend.service;
 
 
-import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.model.Users;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +14,5 @@ public interface UserService {
 
     void createUser(UserDTO userDTO);
 
-    Optional<Users> findUser(String username, String password, String tenant);
+    Optional<Users> findUser(String username, String password, Long tenantId);
 }

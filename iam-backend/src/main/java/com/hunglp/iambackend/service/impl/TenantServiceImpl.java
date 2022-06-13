@@ -26,6 +26,6 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Optional<Tenant> findByTenantName(String name) {
-       return Optional.ofNullable(tenantRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Not found Tenant with name = " + name)));
+       return tenantRepository.findByName(name);
     }
 }

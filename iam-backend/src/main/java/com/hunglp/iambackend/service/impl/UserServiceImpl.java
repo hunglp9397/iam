@@ -126,8 +126,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Users> findUser(String username, String password, String tenant) {
-        return userRepository.findAccount(username, password, tenant, false);
+    public Optional<Users> findUser(String username, String password, Long tenantId) {
+        return userRepository.findAccount(username, password, tenantId, false);
     }
 
 

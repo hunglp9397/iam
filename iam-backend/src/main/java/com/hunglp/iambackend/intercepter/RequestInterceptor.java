@@ -2,16 +2,25 @@ package com.hunglp.iambackend.intercepter;
 
 import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.service.TenantService;
+import com.hunglp.iambackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
+@Configuration
 public class RequestInterceptor implements HandlerInterceptor {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private UserService userService;
+
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -26,11 +35,16 @@ public class RequestInterceptor implements HandlerInterceptor {
             response.setStatus(400);
             return false;
         }
-        Optional<Tenant> tenant = tenantService.findByTenantName(tenantId);
-        if(tenant.isPresent())
 
-        TenantContext.setCurrentTenant(tenantId);
-        return true;
+        Optional<Tenant> tenant = tenantService.findByTenantName(tenantId);
+        if (tenant.isPresent()) {
+            TenantContext.setCurrentTenant(tenantId);
+            return true;
+        } else {
+            response.getWriter().write("X-TenantID not exist or deleted");
+            response.setStatus(400);
+            return false;
+        }
     }
 
     @Override
