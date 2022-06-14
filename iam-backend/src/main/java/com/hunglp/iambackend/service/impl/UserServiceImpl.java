@@ -2,11 +2,13 @@ package com.hunglp.iambackend.service.impl;
 
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
+import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
 import com.hunglp.iambackend.repository.TenantRepository;
 import com.hunglp.iambackend.repository.UserRepository;
 import com.hunglp.iambackend.service.KeycloakService;
+import com.hunglp.iambackend.service.RedisService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
@@ -29,9 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -52,13 +52,39 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private KeycloakService keycloakService;
 
+    @Autowired
+    private RedisService redisService;
+
 
     @Override
     public ResponseEntity<String> login(String username, String password, String tenant) {
         ResponseEntity<String> response = keycloakService.authentication(username, password, tenant);
+
+        String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
+
+        int countLoginFail = redisService.getValueByKey(keyRedisLoginFail) != null ? Integer.parseInt(redisService.getValueByKey(keyRedisLoginFail)) : 0;
+        if(countLoginFail > 5){
+
+        }
+        if (response.getStatusCodeValue() == 200){
+            Optional<Users> usersOptional = findUser(username, password, tenant);
+            if(usersOptional.isPresent()){
+
+                return response;
+            }else{
+                countLoginFail ++;
+                redisService.saveKeyValue(keyRedisLoginFail, String.valueOf(countLoginFail));
+
+                throw new UnauthorizedException("Authorization Fail. Username or password incorrect");
+            }
+        }
+
+
+
         return response;
 
     }
+
 
     @Override
     public void createUser(UserDTO userDTO) {
@@ -126,9 +152,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Users> findUser(String username, String password, Long tenantId) {
-        return userRepository.findAccount(username, password, tenantId, false);
+    public Optional<Users> findUser(String username, String password, String tenant) {
+        return userRepository.findAccount(username, password, tenant, false);
     }
-
 
 }

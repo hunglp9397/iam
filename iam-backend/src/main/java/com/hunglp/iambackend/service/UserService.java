@@ -14,5 +14,5 @@ public interface UserService {
 
     void createUser(UserDTO userDTO);
 
-    Optional<Users> findUser(String username, String password, Long tenantId);
+    Optional<Users> findUser(String username, String password, String tenant);
 }

@@ -4,6 +4,8 @@ import java.util.Base64;
 
 public class CommonFunction {
 
+    public static final String COUNT_LOGIN_FAIL="count_login_fail";
+
     public static String passwordBase64(String password){
         return Base64.getEncoder().encodeToString(password.getBytes());
     }
@@ -16,6 +18,13 @@ public class CommonFunction {
 
     public static String getAuthenUrl(String realm) {
         return "http://localhost:8080/auth/realms/" + realm + "/protocol/openid-connect/token";
+    }
 
+    public static String createKeyRedis(String username, String tenantName, String token){
+        return username + tenantName + token;
+    }
+
+    public static String createKeyRedisLoginFail(String username, String tenantName){
+        return username + tenantName + COUNT_LOGIN_FAIL;
     }
 }

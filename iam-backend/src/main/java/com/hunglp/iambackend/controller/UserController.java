@@ -3,6 +3,7 @@ package com.hunglp.iambackend.controller;
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.exception.ResourceNotFoundException;
+import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.intercepter.TenantContext;
 import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
@@ -61,14 +62,20 @@ public class UserController {
 
         ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
 
-        if (authenticateResponse.getStatusCodeValue() == 200){
-            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getTenantId());
-            if(usersOptional.isPresent()){
-                return authenticateResponse;
-            }else{
-                throw new ResourceNotFoundException("Query fail");
-            }
-        }
+//        int countLoginFail = 0;
+//        if (authenticateResponse.getStatusCodeValue() == 200){
+//            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getTenantId());
+//            if(usersOptional.isPresent()){
+//                return authenticateResponse;
+//            }else{
+//
+//                String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(loginDTO.getUsername(), tenantName);
+//
+//
+//
+//                throw new UnauthorizedException("Authorization Fail. Username or password incorrect");
+//            }
+//        }
 
         return authenticateResponse;
 
