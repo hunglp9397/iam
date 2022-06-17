@@ -55,12 +55,12 @@ public class UserController {
 
 
     @PostMapping("/auth/login")
-    public ResponseEntity<String> doLogin(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<Object> doLogin(@RequestBody LoginDTO loginDTO) {
 
         String tenantName = TenantContext.getCurrentTenant();
         Optional<Tenant> tenant = tenantService.findByTenantName(tenantName);
 
-        ResponseEntity<String> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
+        ResponseEntity<Object> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
 
 //        int countLoginFail = 0;
 //        if (authenticateResponse.getStatusCodeValue() == 200){

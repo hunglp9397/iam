@@ -40,7 +40,7 @@ public class KeycloakService {
         this.kcProvider = keycloakProvider;
     }
 
-    public ResponseEntity<String> authentication(String username, String password, String clientId) {
+    public ResponseEntity<Object> authentication(String username, String password, String clientId) {
 
         RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.getAuthenUrl(environment.getProperty("keycloak.realm"));
@@ -57,9 +57,9 @@ public class KeycloakService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        ResponseEntity<String> response = null;
+        ResponseEntity<Object> response = null;
         try {
-            response = restTemplate.postForEntity(url, request, String.class);
+            response = restTemplate.postForEntity(url, request, Object.class);
         } catch (Exception e) {
             throw new UnauthorizedException("Authorization  fail");
         }

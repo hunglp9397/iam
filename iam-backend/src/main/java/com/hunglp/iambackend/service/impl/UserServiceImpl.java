@@ -2,6 +2,7 @@ package com.hunglp.iambackend.service.impl;
 
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
+import com.hunglp.iambackend.exception.InternalServerErrorException;
 import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
@@ -57,20 +58,26 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<String> login(String username, String password, String tenant) {
-        ResponseEntity<String> response = keycloakService.authentication(username, password, tenant);
+    public ResponseEntity<Object> login(String username, String password, String tenant) {
+        ResponseEntity<Object> response = keycloakService.authentication(username, password, tenant);
 
+        LinkedHashMap<String, String > responseMap = (LinkedHashMap<String, String>) response.getBody();
         String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
+        String keyRedisAccessToken = CommonFunction.createKeyRedis(username,tenant,responseMap.get("access_token"));
+        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username,tenant,responseMap.get("refresh_token"));
+
+
 
         int countLoginFail = redisService.getValueByKey(keyRedisLoginFail) != null ? Integer.parseInt(redisService.getValueByKey(keyRedisLoginFail)) : 0;
         if(countLoginFail > 5){
 
+            throw new InternalServerErrorException("5 failed login attempts. Yours account will be block if login fail over 10 attempts");
         }
         if (response.getStatusCodeValue() == 200){
             Optional<Users> usersOptional = findUser(username, password, tenant);
             if(usersOptional.isPresent()){
-
-                return response;
+                redisService.saveKeyValue(keyRedisRefreshToken, String.valueOf(1800));
+                redisService.saveKeyValue(keyRedisAccessToken, String.valueOf(300));
             }else{
                 countLoginFail ++;
                 redisService.saveKeyValue(keyRedisLoginFail, String.valueOf(countLoginFail));
@@ -78,8 +85,6 @@ public class UserServiceImpl implements UserService {
                 throw new UnauthorizedException("Authorization Fail. Username or password incorrect");
             }
         }
-
-
 
         return response;
 

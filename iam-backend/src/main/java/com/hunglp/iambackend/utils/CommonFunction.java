@@ -25,6 +25,6 @@ public class CommonFunction {
     }
 
     public static String createKeyRedisLoginFail(String username, String tenantName){
-        return username + tenantName + COUNT_LOGIN_FAIL;
+        return username + "-" + tenantName + "-" + COUNT_LOGIN_FAIL;
     }
 }

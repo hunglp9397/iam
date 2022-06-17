@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserService {
 
-    ResponseEntity<String> login(String username, String password, String tenant);
+    ResponseEntity<Object> login(String username, String password, String tenant);
 
     void createUser(UserDTO userDTO);
 
