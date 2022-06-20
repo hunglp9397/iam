@@ -20,6 +20,10 @@ public class CommonFunction {
         return "http://localhost:8080/auth/realms/" + realm + "/protocol/openid-connect/token";
     }
 
+    public static String createKeyCloakUserUrl(String realm){
+        return "http://localhost:8080/auth/admin/realms/" + realm + "/users";
+    }
+
     public static String createKeyRedis(String username, String tenantName, String token){
         return username + tenantName + token;
     }

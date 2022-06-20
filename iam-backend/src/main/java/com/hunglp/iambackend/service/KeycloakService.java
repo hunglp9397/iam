@@ -33,6 +33,9 @@ public class KeycloakService {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     private final KeycloakProvider kcProvider;
 
 
@@ -67,51 +70,32 @@ public class KeycloakService {
 
     }
 
-    public void createKeycloakUser(UserDTO userDTO) {
-//        UsersResource usersResource = kcProvider.getInstance().realm(realm).users();
-//        CredentialRepresentation credentialRepresentation = createPasswordCredentials(userDTO.getPassword());
-//
-//        UserRepresentation kcUser = new UserRepresentation();
-//        kcUser.setUsername(userDTO.getEmail());
-//        kcUser.setCredentials(Collections.singletonList(credentialRepresentation));
-//        kcUser.setFirstName(userDTO.getFirstName());
-//        kcUser.setLastName(userDTO.getLastName());
-//        kcUser.setEmail(userDTO.getEmail());
-//        kcUser.setEnabled(true);
-//        kcUser.setEmailVerified(false);
-//
-//        Response response = null;
-//        try {
-//             response = usersResource.create(kcUser);
-//        }catch (Exception e){
-//            System.out.println(e.getMessage());
-//        }
-//
-//
-//        if (response.getStatus() == 201) {
-//            System.out.println("Create user successfully");
-//        }
-//
-//        return response;
+    public ResponseEntity<Object> createKeycloakUser(UserDTO userDTO) {
 
-        CredentialRepresentation credential = KeycloakProvider
-                .createPasswordCredentials(userDTO.getPassword());
-        UserRepresentation user = new UserRepresentation();
-        user.setUsername(userDTO.getUsername());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
-        user.setCredentials(Collections.singletonList(credential));
-        user.setEnabled(true);
+        RestTemplate restTemplate = new RestTemplate();
+        String url = CommonFunction.createKeyCloakUserUrl(environment.getProperty("keycloak.realm"));
 
-        UsersResource instance = getInstance();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + userDTO.getAuthToken());
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("firstName", userDTO.getFirstName());
+        map.add("lastName", userDTO.getLastName());
+        map.add("email", userDTO.getEmail());
+        map.add("username", "password");
+        map.add("enabled", String.valueOf(true));
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+        ResponseEntity<Object> response = null;
         try {
-            instance.create(user);
-        }catch (Exception e){
-            System.out.println(e);
+            response = restTemplate.postForEntity(url, request, Object.class);
+        } catch (Exception e) {
+            throw new UnauthorizedException("Authorization  fail");
         }
-
+        return response;
     }
+
 
     private static CredentialRepresentation createPasswordCredentials(String password) {
         CredentialRepresentation passwordCredentials = new CredentialRepresentation();
@@ -121,7 +105,7 @@ public class KeycloakService {
         return passwordCredentials;
     }
 
-    public UsersResource getInstance(){
+    public UsersResource getInstance() {
         return kcProvider.getInstance().realm(kcProvider.realm).users();
     }
 

@@ -62,53 +62,18 @@ public class UserController {
 
         ResponseEntity<Object> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
 
-//        int countLoginFail = 0;
-//        if (authenticateResponse.getStatusCodeValue() == 200){
-//            Optional<Users> usersOptional = userService.findUser(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getTenantId());
-//            if(usersOptional.isPresent()){
-//                return authenticateResponse;
-//            }else{
-//
-//                String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(loginDTO.getUsername(), tenantName);
-//
-//
-//
-//                throw new UnauthorizedException("Authorization Fail. Username or password incorrect");
-//            }
-//        }
-
         return authenticateResponse;
 
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
 
         String tenant = TenantContext.getCurrentTenant();
-        System.out.println(tenant);
-        keycloakService.createKeycloakUser(userDTO);
-        return ResponseEntity.ok(userDTO);
 
+         userService.createUser(userDTO);
+
+         return null;
     }
-
-
-//    @PostMapping(path = "/signin")
-//    public ResponseEntity<?> signin(@RequestBody  UserDTO userDTO) {
-//
-//        Map<String, Object> clientCredentials = new HashMap<>();
-//        clientCredentials.put("secret", clientSecret);
-//        clientCredentials.put("grant_type", "password");
-//
-//        Configuration configuration =
-//                new Configuration(authServerUrl, realm, clientId, clientCredentials, null);
-//        AuthzClient authzClient = AuthzClient.create(configuration);
-//
-//        AccessTokenResponse response =
-//                authzClient.obtainAccessToken(userDTO.getEmail(), userDTO.getPassword());
-//
-//        return ResponseEntity.ok(response);
-//    }
-
-
 
 }

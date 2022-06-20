@@ -93,65 +93,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(UserDTO userDTO) {
-        Users user = new Users();
-        user.setUsername(user.getUsername());
-        user.setPassword(user.getPassword());
-        Optional<Tenant> tenant = tenantRepository.findById(1L);
-        user.setTenant(tenant.get());
-
-        this.userRepository.save(user);
+        ResponseEntity<Object> response = keycloakService.createKeycloakUser(userDTO);
+        System.out.println(response);
 
 
-//        Keycloak keycloak = KeycloakBuilder.builder().serverUrl(env.getProperty("keycloak.auth-server-url"))
-//                .grantType(OAuth2Constants.PASSWORD).realm("master").clientId("admin-cli")
-//                .username(userDTO.getUsername()).password(CommonFunction.passwordBase64(userDTO.getPassword()))
-//                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build()).build();
+//        Users user = new Users();
+//        user.setUsername(user.getUsername());
+//        user.setPassword(user.getPassword());
+//        Optional<Tenant> tenant = tenantRepository.findById(1L);
+//        user.setTenant(tenant.get());
 //
-//        UserRepresentation userRepresentation = new UserRepresentation();
-//        userRepresentation.setEnabled(true);
-//        userRepresentation.setUsername(userDTO.getUsername());
-//        userRepresentation.setFirstName(userDTO.getFirstName());
-//        userRepresentation.setLastName(userDTO.getLastName());
-//        userRepresentation.setEmail(userDTO.getEmail());
-//
-//        RealmResource realmResource = keycloak.realm(env.getProperty("keycloak.realm"));
-//        UsersResource usersRessource = realmResource.users();
-//
-//        Response response = null;
-//        try {
-//            response = usersRessource.create(userRepresentation);
-//        } catch (Exception ex) {
-//            System.out.println(ex.getMessage());
-//        }
-//
-//
-//        userDTO.setStatusCode(response.getStatus());
-//        userDTO.setStatus(response.getStatusInfo().toString());
-//
-//        if (response.getStatus() == 201) {
-//
-//            String userId = CreatedResponseUtil.getCreatedId(response);
-//
-////            log.info("Created userId {}", userId);
-//
-//
-//            // create password credential
-//            CredentialRepresentation passwordCred = new CredentialRepresentation();
-//            passwordCred.setTemporary(false);
-//            passwordCred.setType(CredentialRepresentation.PASSWORD);
-//            passwordCred.setValue(userDTO.getPassword());
-//
-//            UserResource userResource = usersRessource.get(userId);
-//
-//            // Set password credential
-//            userResource.resetPassword(passwordCred);
-//
-//            // Get realm role student
-//            RoleRepresentation realmRoleUser = realmResource.roles().get(CommonConstant.roleUser).toRepresentation();
-//
-//            // Assign realm role student to user
-//            userResource.roles().realmLevel().add(Arrays.asList(realmRoleUser));
-//        }
+//        this.userRepository.save(user);
 
 
     }
