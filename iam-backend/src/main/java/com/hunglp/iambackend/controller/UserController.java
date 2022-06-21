@@ -53,7 +53,6 @@ public class UserController {
     private TenantService tenantService;
 
 
-
     @PostMapping("/auth/login")
     public ResponseEntity<Object> doLogin(@RequestBody LoginDTO loginDTO) {
 
@@ -70,10 +69,9 @@ public class UserController {
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
 
         String tenant = TenantContext.getCurrentTenant();
+        userService.createUser(userDTO, tenant);
 
-         userService.createUser(userDTO);
-
-         return null;
+        return null;
     }
 
 }

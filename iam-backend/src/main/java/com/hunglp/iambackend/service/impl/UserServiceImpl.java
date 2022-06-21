@@ -3,6 +3,7 @@ package com.hunglp.iambackend.service.impl;
 import com.hunglp.iambackend.dto.LoginDTO;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.exception.InternalServerErrorException;
+import com.hunglp.iambackend.exception.ResourceAlreadyExistException;
 import com.hunglp.iambackend.exception.UnauthorizedException;
 import com.hunglp.iambackend.model.Tenant;
 import com.hunglp.iambackend.model.Users;
@@ -61,25 +62,24 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<Object> login(String username, String password, String tenant) {
         ResponseEntity<Object> response = keycloakService.authentication(username, password, tenant);
 
-        LinkedHashMap<String, String > responseMap = (LinkedHashMap<String, String>) response.getBody();
+        LinkedHashMap<String, String> responseMap = (LinkedHashMap<String, String>) response.getBody();
         String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
-        String keyRedisAccessToken = CommonFunction.createKeyRedis(username,tenant,responseMap.get("access_token"));
-        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username,tenant,responseMap.get("refresh_token"));
-
+        String keyRedisAccessToken = CommonFunction.createKeyRedis(username, tenant, responseMap.get("access_token"));
+        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username, tenant, responseMap.get("refresh_token"));
 
 
         int countLoginFail = redisService.getValueByKey(keyRedisLoginFail) != null ? Integer.parseInt(redisService.getValueByKey(keyRedisLoginFail)) : 0;
-        if(countLoginFail > 5){
+        if (countLoginFail > 5) {
 
             throw new InternalServerErrorException("5 failed login attempts. Yours account will be block if login fail over 10 attempts");
         }
-        if (response.getStatusCodeValue() == 200){
+        if (response.getStatusCodeValue() == 200) {
             Optional<Users> usersOptional = findUser(username, password, tenant);
-            if(usersOptional.isPresent()){
+            if (usersOptional.isPresent()) {
                 redisService.saveKeyValue(keyRedisRefreshToken, String.valueOf(1800));
                 redisService.saveKeyValue(keyRedisAccessToken, String.valueOf(300));
-            }else{
-                countLoginFail ++;
+            } else {
+                countLoginFail++;
                 redisService.saveKeyValue(keyRedisLoginFail, String.valueOf(countLoginFail));
 
                 throw new UnauthorizedException("Authorization Fail. Username or password incorrect");
@@ -91,19 +91,16 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
+
     @Override
-    public void createUser(UserDTO userDTO) {
+    public void createUser(UserDTO userDTO, String tenant) {
+
+        if (findByUsernameAndTenant(userDTO.getUsername(), tenant).isPresent()) {
+            throw new ResourceAlreadyExistException("username already exist");
+        }
         ResponseEntity<Object> response = keycloakService.createKeycloakUser(userDTO);
         System.out.println(response);
-
-
-//        Users user = new Users();
-//        user.setUsername(user.getUsername());
-//        user.setPassword(user.getPassword());
-//        Optional<Tenant> tenant = tenantRepository.findById(1L);
-//        user.setTenant(tenant.get());
-//
-//        this.userRepository.save(user);
 
 
     }
@@ -111,6 +108,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<Users> findUser(String username, String password, String tenant) {
         return userRepository.findAccount(username, password, tenant, false);
+    }
+
+    @Override
+    public Optional<Users> findByUsernameAndTenant(String username, String tenant) {
+        return userRepository.findByUsernameAndTenant(username, tenant);
     }
 
 }

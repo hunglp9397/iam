@@ -54,11 +54,11 @@ public class KeycloakService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        ResponseEntity<Object> response = null;
+        ResponseEntity<Object> response;
         try {
             response = restTemplate.postForEntity(url, request, Object.class);
         } catch (Exception e) {
-            throw new UnauthorizedException("Authorization  fail");
+            throw new UnauthorizedException("Authorization fail");
         }
         return response;
 
