@@ -1,6 +1,6 @@
 package com.hunglp.iambackend.service;
 
-import com.hunglp.iambackend.config.KeycloakConfig;
+
 import com.hunglp.iambackend.config.KeycloakProvider;
 import com.hunglp.iambackend.dto.UserDTO;
 import com.hunglp.iambackend.exception.UnauthorizedException;
@@ -18,11 +18,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.keycloak.representations.idm.UserRepresentation;
-
-
-import javax.ws.rs.core.Response;
-import java.util.Collections;
 
 @Service
 public class KeycloakService {
@@ -45,7 +40,6 @@ public class KeycloakService {
 
     public ResponseEntity<Object> authentication(String username, String password, String clientId) {
 
-        RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.getAuthenUrl(environment.getProperty("keycloak.realm"));
 
         HttpHeaders headers = new HttpHeaders();
@@ -72,26 +66,26 @@ public class KeycloakService {
 
     public ResponseEntity<Object> createKeycloakUser(UserDTO userDTO) {
 
-        RestTemplate restTemplate = new RestTemplate();
         String url = CommonFunction.createKeyCloakUserUrl(environment.getProperty("keycloak.realm"));
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + userDTO.getAuthToken());
+        headers.setBearerAuth(userDTO.getAuthToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("firstName", userDTO.getFirstName());
-        map.add("lastName", userDTO.getLastName());
-        map.add("email", userDTO.getEmail());
-        map.add("username", "password");
-        map.add("enabled", String.valueOf(true));
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("firstName", userDTO.getFirstName());
+        body.add("lastName", userDTO.getLastName());
+        body.add("email", userDTO.getEmail());
+        body.add("username", "password");
+        body.add("enabled", String.valueOf(true));
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Object> response = null;
+        ResponseEntity<Object> response;
         try {
-            response = restTemplate.postForEntity(url, request, Object.class);
+            response = (ResponseEntity<Object>) restTemplate.postForObject(url, request, Object.class);
         } catch (Exception e) {
-            throw new UnauthorizedException("Authorization  fail");
+            throw new UnauthorizedException("Authorization fail");
         }
         return response;
     }
