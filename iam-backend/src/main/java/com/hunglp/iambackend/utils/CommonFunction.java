@@ -4,7 +4,25 @@ import java.util.Base64;
 
 public class CommonFunction {
 
-    public static final String COUNT_LOGIN_FAIL="count_login_fail";
+    public static final String COUNT_LOGIN_FAIL="LoginFail";
+    public static final String ACCESS_TOKEN = "AccessToken";
+    public static final String REFRESH_TOKEN = "RefreshToken";
+
+    public enum TokenType {
+        COUNT_LOGIN_FAIL("LoginFail"),
+        ACCESS_TOKEN("AccessToken"),
+        REFRESH_TOKEN("RefreshToken");
+
+        private String name;
+
+        private TokenType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 
     public static String passwordBase64(String password){
         return Base64.getEncoder().encodeToString(password.getBytes());
@@ -24,11 +42,12 @@ public class CommonFunction {
         return "http://localhost:8080/auth/admin/realms/" + realm + "/users";
     }
 
-    public static String createKeyRedis(String username, String tenantName, String token){
-        return username + "-" + tenantName + "-" + token;
+    public static String createKeyRedis(String username, String tenantName, TokenType tokenType){
+        return username + "::" + tenantName + "::" + tokenType.getName();
     }
 
     public static String createKeyRedisLoginFail(String username, String tenantName){
-        return username + "-" + tenantName + "-" + COUNT_LOGIN_FAIL;
+        return username + "::" + tenantName + "::" + COUNT_LOGIN_FAIL;
     }
+
 }

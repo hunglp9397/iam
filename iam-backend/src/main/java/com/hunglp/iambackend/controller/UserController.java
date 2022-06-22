@@ -53,17 +53,7 @@ public class UserController {
     private TenantService tenantService;
 
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<Object> doLogin(@RequestBody LoginDTO loginDTO) {
 
-        String tenantName = TenantContext.getCurrentTenant();
-        Optional<Tenant> tenant = tenantService.findByTenantName(tenantName);
-
-        ResponseEntity<Object> authenticateResponse = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), tenant.get().getName());
-
-        return authenticateResponse;
-
-    }
 
     @PostMapping("/users")
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {

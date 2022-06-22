@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
 
         LinkedHashMap<String, String> responseMap = (LinkedHashMap<String, String>) response.getBody();
         String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
-        String keyRedisAccessToken = CommonFunction.createKeyRedis(username, tenant, responseMap.get("access_token"));
-        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username, tenant, responseMap.get("refresh_token"));
+        String keyRedisAccessToken = CommonFunction.createKeyRedis(username, tenant, CommonFunction.TokenType.ACCESS_TOKEN);
+        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username, tenant, CommonFunction.TokenType.REFRESH_TOKEN);
 
 
         int countLoginFail = redisService.getValueByKey(keyRedisLoginFail) != null ? Integer.parseInt(redisService.getValueByKey(keyRedisLoginFail)) : 0;
