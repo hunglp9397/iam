@@ -42,12 +42,15 @@ public class CommonFunction {
         return "http://localhost:8080/auth/admin/realms/" + realm + "/users";
     }
 
-    public static String createKeyRedis(String username, String tenantName, TokenType tokenType){
-        return username + "::" + tenantName + "::" + tokenType.getName();
+    public static String createKeyRedisWithToken(String username, String tenantName, TokenType tokenType, String token){
+        return username + "::" + tenantName + "::" + tokenType.getName() + "::" + token;
     }
 
     public static String createKeyRedisLoginFail(String username, String tenantName){
         return username + "::" + tenantName + "::" + COUNT_LOGIN_FAIL;
     }
 
+    public static String createKeyRedisPrefix(String username, String tenantName ){
+        return username + "::" + tenantName +"::*";
+    }
 }

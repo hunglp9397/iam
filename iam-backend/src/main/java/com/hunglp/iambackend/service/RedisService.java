@@ -4,6 +4,8 @@ package com.hunglp.iambackend.service;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 
+import java.util.List;
+
 public interface RedisService {
 
     String getValueByKey(String key);
@@ -14,8 +16,6 @@ public interface RedisService {
 
     void updateValueByKey(String key, String value);
 
-    String getValueByKeyPrefix(String keyPattern);
-
-
+    List<String> getKeyPrefix(String keyPattern);
 
 }

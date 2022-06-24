@@ -63,9 +63,10 @@ public class UserServiceImpl implements UserService {
         ResponseEntity<Object> response = keycloakService.authentication(username, password, tenant);
 
         LinkedHashMap<String, String> responseMap = (LinkedHashMap<String, String>) response.getBody();
+
         String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
-        String keyRedisAccessToken = CommonFunction.createKeyRedis(username, tenant, CommonFunction.TokenType.ACCESS_TOKEN);
-        String keyRedisRefreshToken = CommonFunction.createKeyRedis(username, tenant, CommonFunction.TokenType.REFRESH_TOKEN);
+        String keyRedisAccessToken = CommonFunction.createKeyRedisWithToken(username, tenant, CommonFunction.TokenType.ACCESS_TOKEN, responseMap.get("access_token"));
+        String keyRedisRefreshToken = CommonFunction.createKeyRedisWithToken(username, tenant, CommonFunction.TokenType.REFRESH_TOKEN, responseMap.get("refresh_token"));
 
 
         int countLoginFail = redisService.getValueByKey(keyRedisLoginFail) != null ? Integer.parseInt(redisService.getValueByKey(keyRedisLoginFail)) : 0;
@@ -89,8 +90,6 @@ public class UserServiceImpl implements UserService {
         return response;
 
     }
-
-
 
 
     @Override

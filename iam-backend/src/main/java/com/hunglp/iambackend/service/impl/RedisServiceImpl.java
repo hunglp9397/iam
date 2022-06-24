@@ -2,10 +2,14 @@ package com.hunglp.iambackend.service.impl;
 
 import com.hunglp.iambackend.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -34,18 +38,20 @@ public class RedisServiceImpl implements RedisService {
         return template.opsForValue().get(key);
     }
 
-
     @Override
-    public String getValueByKeyPrefix(String keyPattern) {
+    public List<String> getKeyPrefix(String keyPattern) {
+        List<String> listKeys = new ArrayList<>();
+        RedisConnection redisConnection = null;
 
-        ScanOptions scanOptions = ScanOptions.scanOptions().match(keyPattern).count(20).build();
-        Cursor c = template.getConnectionFactory().getConnection().scan(scanOptions); // scanning in db
+        redisConnection = template.getConnectionFactory().getConnection();
+        ScanOptions options = ScanOptions.scanOptions().match(keyPattern).count(100).build();
+
+        Cursor c = redisConnection.scan(options);
         while (c.hasNext()) {
-            System.out.println(c.next());
+            listKeys.add(new String((byte[]) c.next()));
         }
 
-        return "abc";
-
-
+        return listKeys;
     }
+
 }
