@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -21,6 +22,12 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void saveKeyValue(String key, String value) {
         template.opsForValue().set(key, value);
+    }
+
+    @Override
+    public void saveKeyValueWithExpire(String key, String value, int seconds) {
+        template.opsForValue().set(key, value);
+        template.expire(key,seconds, TimeUnit.SECONDS);
     }
 
     @Override

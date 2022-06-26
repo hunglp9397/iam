@@ -12,6 +12,8 @@ public interface RedisService {
 
     void saveKeyValue(String key, String value);
 
+    void saveKeyValueWithExpire(String key, String value, int seconds);
+
     void deleteValueByKey(String key);
 
     void updateValueByKey(String key, String value);

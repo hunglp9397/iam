@@ -14,6 +14,7 @@ import com.hunglp.iambackend.service.RedisService;
 import com.hunglp.iambackend.service.UserService;
 import com.hunglp.iambackend.utils.CommonConstant;
 import com.hunglp.iambackend.utils.CommonFunction;
+import com.hunglp.iambackend.utils.IAMResponse;
 import org.apache.http.auth.Credentials;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<Object> login(String username, String password, String tenant) {
         ResponseEntity<Object> response = keycloakService.authentication(username, password, tenant);
 
-        LinkedHashMap<String, String> responseMap = (LinkedHashMap<String, String>) response.getBody();
+        HashMap<String, String> responseMap = (HashMap<String, String>) response.getBody();
 
         String keyRedisLoginFail = CommonFunction.createKeyRedisLoginFail(username, tenant);
         String keyRedisAccessToken = CommonFunction.createKeyRedisWithToken(username, tenant, CommonFunction.TokenType.ACCESS_TOKEN, responseMap.get("access_token"));
@@ -77,8 +78,12 @@ public class UserServiceImpl implements UserService {
         if (response.getStatusCodeValue() == 200) {
             Optional<Users> usersOptional = findUser(username, password, tenant);
             if (usersOptional.isPresent()) {
-                redisService.saveKeyValue(keyRedisRefreshToken, String.valueOf(1800));
-                redisService.saveKeyValue(keyRedisAccessToken, String.valueOf(300));
+                Users user = usersOptional.get();
+                responseMap.put("authenticationType", user.getAuthenticationType());
+
+
+                redisService.saveKeyValueWithExpire(keyRedisAccessToken,"1",1800);
+                redisService.saveKeyValueWithExpire(keyRedisRefreshToken,"1", 300);
             } else {
                 countLoginFail++;
                 redisService.saveKeyValue(keyRedisLoginFail, String.valueOf(countLoginFail));
@@ -87,8 +92,8 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        return response;
-
+        HashMap<String,String> responseBody = new HashMap<>(responseMap);
+        return ResponseEntity.ok().headers(response.getHeaders()).body(responseBody);
     }
 
 
