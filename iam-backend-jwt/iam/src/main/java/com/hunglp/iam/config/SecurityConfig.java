@@ -1,4 +1,4 @@
-package com.hunglp.iam.security;
+package com.hunglp.iam.config;
 
 import com.hunglp.iam.filter.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
